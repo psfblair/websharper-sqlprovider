@@ -22,7 +22,7 @@ The following alternative approaches didn't work:
 
 2. Using the `gacutil` to put the assemblies into the GAC
 
-3. Placing the `<loadFromRemoteSources>` element in the config files of the IDE (`XamarinStudio.exe.config`) in `Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/XamarinStudio.exe.config`
+3. Placing the `<loadFromRemoteSources>` element in the config files of the IDE; i.e.,  `Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/XamarinStudio.exe.config`
 
 4. Calling `System.Reflection.Assembly.UnsafeLoadFrom` in the code before the type provider is invoked
 
