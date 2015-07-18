@@ -17,9 +17,13 @@ the project. For IntelliSense, the libraries had to be copied into the
 `/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin` directory.
 
 The following alternative approaches didn't work:
+
 1. In Xamarin Studio, setting the location of the dlls in `Preferences -> Build -> Assembly Folders (Custom folders where Xamarin should look for assemblies and packages)`
-2. Using the gacutil to put the assemblies into the GAC
+
+2. Using the `gacutil` to put the assemblies into the GAC
+
 3. Placing the `<loadFromRemoteSources>` element in the config files of the IDE (`XamarinStudio.exe.config`) in `Xamarin Studio.app/Contents/Resources/lib/monodevelop/bin/XamarinStudio.exe.config`
-4. Calling `System.Reflection.Assembly.UnsafeLoadFrom` in the code before the type provider is invoked.
+
+4. Calling `System.Reflection.Assembly.UnsafeLoadFrom` in the code before the type provider is invoked
 
 Note also that for working with the type provider, the project references must include `System` and `System.Data`.
