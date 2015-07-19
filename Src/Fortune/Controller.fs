@@ -9,11 +9,12 @@ open WebSharper.Sitelets
 open WebSharper.Sitelets.Content
 open System
 
-let private additionalFortune = { id = 0; message = "Additional fortune added at request time." }
+let private additionalFortune = seq { yield { id = 0; message = "Additional fortune added at request time." } }
+let private sortedByMessage = Seq.sortBy (fun fortune -> fortune.message)
 
 //Would like this to be private but want to test it
-let internal fortunes = seq { yield additionalFortune }
+let internal fortunes = additionalFortune 
                         |> Seq.append allFortunes
-                        |> Seq.sortBy (fun fortune -> fortune.message)
+                        |> sortedByMessage
 
-let fortuneContent context = async { return fortunePageContentFor fortunes }
+let fortuneContent context = async { return fortunes |> toFortunePageContent }

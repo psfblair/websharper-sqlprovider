@@ -40,9 +40,9 @@ let private updateRandomWorldRecordWithRandomValue (dataContext: Db.dataContext)
 (* ********************************************* PUBLIC ************************************************ *)
 let worldWithId (id: int): World =  id |> singleQueryFromWorld (Db.GetDataContext())
 
-let worldForRandomId (random: Random) : World =  next random |> singleQueryFromWorld (Db.GetDataContext())
+let worldForRandomId (random: Random): World =  next random |> singleQueryFromWorld (Db.GetDataContext())
 
-let multipleRandomWorlds (numberOfQueries: int) (random: Random): Async<array<World>> = 
+let multipleRandomWorlds (random: Random) (numberOfQueries: int): Async<array<World>> = 
         Async.Parallel [ for i in 1..numberOfQueries -> 
                                         async { 
                                                 return random |> singleRandomQueryFromWorld (Db.GetDataContext()) 
@@ -50,7 +50,7 @@ let multipleRandomWorlds (numberOfQueries: int) (random: Random): Async<array<Wo
 
 let updateWorldWithId (id: int) (update: int): World = updateSingleWorldRecord (Db.GetDataContext()) id update
 
-let updateMultipleRandomWorldsWithRandomValues (numberOfQueries: int) (random: Random): Async<array<World>> =
+let updateMultipleRandomWorldsWithRandomValues (random: Random) (numberOfQueries: int): Async<array<World>> =
         Async.Parallel [ for i in 1..numberOfQueries -> 
                                         async { 
                                                 return random |> updateRandomWorldRecordWithRandomValue (Db.GetDataContext()) 

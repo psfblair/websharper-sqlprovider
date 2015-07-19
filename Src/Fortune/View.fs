@@ -7,18 +7,24 @@ open WebSharper.Sitelets
 open WebSharper.Sitelets.Content
 open WebSharper.Html.Server
 
-let private tableRowFor (fortune: Fortune): Element =
+let private headerRow: Element = TR [ TH [Text "id"] ; TH [Text "message"] ]
+
+let private fortuneRow (fortune: Fortune): Element =
     let idString = fortune.id.ToString()
     TR [ 
         TD [Text idString]
         TD [Text fortune.message] 
     ]
 
-let private fortunePageBodyFor (fortunes: seq<Fortune>): Element =
-    let headerRow = TR [ TH [Text "id"] ; TH [Text "message"] ]
-    let bodyRows = fortunes |> Seq.map tableRowFor |> Seq.toList
-    Table (headerRow :: bodyRows)
+let private toFortuneRows (fortunes: seq<Fortune>): list<Element> =
+    fortunes |> Seq.map fortuneRow |> Seq.toList
+
+let private toTable (headerRow: Element) (fortuneRows: list<Element>): list<Element> =
+    [ Table (headerRow :: fortuneRows) ]
+
+let private toPage (doctype: string) (title: string) (body: list<Element>) = 
+    Warp.Page(Doctype = doctype, Title = title, Body = body)
 
 //Requirement: must be UTF-8 with template starting with <!DOCTYPE html>
-let fortunePageContentFor (fortunes: seq<Fortune>) = 
-    Warp.Page(Doctype = "<!DOCTYPE html>", Title = "Fortunes", Body = [ fortunePageBodyFor fortunes ])
+let toFortunePageContent (fortunes: seq<Fortune>) = 
+    fortunes |> toFortuneRows |> toTable headerRow |> toPage "<!DOCTYPE html>" "Fortunes"

@@ -13,7 +13,7 @@ let ``should retrieve a record from a single random query`` () =
 [<Test>]
 let ``should retrieve multiple records from a multi-random-query`` () = 
     let numberOfQueries = 500
-    let records = multipleRandomWorlds numberOfQueries (System.Random()) |> Async.RunSynchronously
+    let records = numberOfQueries |> multipleRandomWorlds (System.Random()) |> Async.RunSynchronously
     test <@ Array.length records = numberOfQueries @>
 
 [<Test>]
@@ -43,7 +43,7 @@ let ``should update multiple rows in the database`` () =
     let numberOfQueries = 100
     let oldData = query { for row in Db.GetDataContext().``[PUBLIC].[WORLD]`` do select (row.ID, row.RANDOMNUMBER) } 
                     |> Seq.cast |> Map.ofSeq
-    let newData = updateMultipleRandomWorldsWithRandomValues numberOfQueries (System.Random()) |> Async.RunSynchronously
+    let newData = numberOfQueries |> updateMultipleRandomWorldsWithRandomValues (System.Random()) |> Async.RunSynchronously
 
-    // Technically, this could fail if one of our random numbers is the same as the old value. 1/10000 chance.
+    // This will fail if one of our random numbers is the same as the old value. 1/100 chance for any given test run.
     newData |> Array.iter (fun newRow -> test <@ Map.find newRow.id oldData <> newRow.randomNumber @>) 
