@@ -4,6 +4,9 @@ This project is intended for use as one of the frameworks in the TechEmpower Fra
 Benchmark (http://www.techempower.com/benchmarks/). It uses WebSharper Warp with the
 FSharp.Data.SqlProvider type provider, with PostgreSQL as the back-end database.
 
+The runtime database connection string is set by setting the BENCHMARK_DB_CONNECT_STRING
+environment variable in the environment of the process launching the server.
+
 ### Note on working with the type provider: 
 
 Note that for the IDE to find the file--both for IntelliSense autocompletion and for

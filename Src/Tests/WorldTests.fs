@@ -41,7 +41,8 @@ let ``should update one row in the database`` () =
 [<Test>]
 let ``should update multiple rows in the database`` () =
     let numberOfQueries = 100
-    let oldData = query { for row in Db.GetDataContext().``[PUBLIC].[WORLD]`` do select (row.ID, row.RANDOMNUMBER) } 
+    let dbContext = dataContext()
+    let oldData = query { for row in dbContext.``[PUBLIC].[WORLD]`` do select (row.ID, row.RANDOMNUMBER) } 
                     |> Seq.cast |> Map.ofSeq
     let newData = numberOfQueries |> updateMultipleRandomWorldsWithRandomValues (System.Random()) |> Async.RunSynchronously
 

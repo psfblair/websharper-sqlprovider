@@ -7,51 +7,57 @@ open System
 (* ********************************************* PRIVATE ************************************************ *)
 let private next (random: Random) = random.Next(1, 10000)
 
-let private singleQueryFromWorld (dataContext: Db.dataContext) id = 
+let private singleQueryFromWorld (dbContext: Db.dataContext) id = 
     query {
-       for row in dataContext.``[PUBLIC].[WORLD]`` do  
+       for row in dbContext.``[PUBLIC].[WORLD]`` do  
        where (row.ID = id)
        select { id = row.ID; randomNumber = row.RANDOMNUMBER }
     } |> Seq.head
 
 
-let private singleRandomQueryFromWorld (dataContext: Db.dataContext) (random: Random) =
-    next random |> singleQueryFromWorld dataContext
+let private singleRandomQueryFromWorld (dbContext: Db.dataContext) (random: Random) =
+    next random |> singleQueryFromWorld dbContext
 
 
-let private updateSingleWorldRecord (dataContext: Db.dataContext) id update = 
+let private updateSingleWorldRecord (dbContext: Db.dataContext) id update = 
     let record = query {
-                   for row in dataContext.``[PUBLIC].[WORLD]`` do  
+                   for row in dbContext.``[PUBLIC].[WORLD]`` do  
                    where (row.ID = id)
                  } |> Seq.head
 
     let oldRandom = record.RANDOMNUMBER    // Make sure record is actually fetched
     if update <> oldRandom then            // SQLProvider doesn't like it if we update unchanged rows.
         record.RANDOMNUMBER <- update
-        dataContext.SubmitUpdates()
+        dbContext.SubmitUpdates()
     { id = id; randomNumber = update }
 
 
-let private updateRandomWorldRecordWithRandomValue (dataContext: Db.dataContext) (random: Random) = 
+let private updateRandomWorldRecordWithRandomValue (dbContext: Db.dataContext) (random: Random) = 
     let key: int = next random
-    next random |> updateSingleWorldRecord dataContext key 
+    next random |> updateSingleWorldRecord dbContext key 
 
 
 (* ********************************************* PUBLIC ************************************************ *)
-let worldWithId (id: int): World =  id |> singleQueryFromWorld (Db.GetDataContext())
+let worldWithId (id: int): World =  
+    let dbContext = dataContext ()
+    singleQueryFromWorld dbContext id
 
-let worldForRandomId (random: Random): World =  next random |> singleQueryFromWorld (Db.GetDataContext())
+let worldForRandomId (random: Random): World =  
+    let dbContext = dataContext ()
+    singleRandomQueryFromWorld dbContext random
 
 let multipleRandomWorlds (random: Random) (numberOfQueries: int): Async<array<World>> = 
-        Async.Parallel [ for i in 1..numberOfQueries -> 
-                                        async { 
-                                                return random |> singleRandomQueryFromWorld (Db.GetDataContext()) 
-                                        }]
+    Async.Parallel [ for i in 1..numberOfQueries -> 
+                                    async { 
+                                        let dbContext = dataContext ()
+                                        return singleRandomQueryFromWorld dbContext random
+                                    }]
 
-let updateWorldWithId (id: int) (update: int): World = updateSingleWorldRecord (Db.GetDataContext()) id update
+let updateWorldWithId (id: int) (update: int): World = updateSingleWorldRecord (dataContext ()) id update
 
 let updateMultipleRandomWorldsWithRandomValues (random: Random) (numberOfQueries: int): Async<array<World>> =
-        Async.Parallel [ for i in 1..numberOfQueries -> 
-                                        async { 
-                                                return random |> updateRandomWorldRecordWithRandomValue (Db.GetDataContext()) 
-                                        }]
+    Async.Parallel [ for i in 1..numberOfQueries -> 
+                                    async { 
+                                        let dbContext = dataContext ()
+                                        return updateRandomWorldRecordWithRandomValue dbContext random
+                                    }]

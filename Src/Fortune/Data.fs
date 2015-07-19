@@ -6,7 +6,7 @@ open Benchmarks.WebSharper.SqlProvider.Fortunes.Types
 let private queryAllFortunes (dataContext: Db.dataContext) =
     dataContext.``[PUBLIC].[FORTUNE]`` |> Seq.map (fun row -> { id = row.ID; message = row.MESSAGE })
 
-let allFortunes: seq<Fortune> = queryAllFortunes (Db.GetDataContext())
+let allFortunes: seq<Fortune> = dataContext () |> queryAllFortunes
 
 
 
